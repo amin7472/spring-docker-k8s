@@ -1,0 +1,18 @@
+server.port: 2019
+spring.application.name: user-service
+
+
+spring.jpa:
+  hibernate.ddl-auto: none
+  show-sql: false
+
+
+spring.liquibase:
+  change-log: classpath:config/liquibase/db.changelog-master.xml
+  contexts: dev
+
+spring:
+  h2:
+    console.enabled: true
+
+

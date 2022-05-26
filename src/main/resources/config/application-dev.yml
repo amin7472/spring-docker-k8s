@@ -1,0 +1,8 @@
+server.port: 2021
+
+spring.datasource:
+  type: com.zaxxer.hikari.HikariDataSource
+  url: jdbc:postgresql://localhost:5455/postgresDB
+  username: postgresUser
+  password: postgresPW
+
