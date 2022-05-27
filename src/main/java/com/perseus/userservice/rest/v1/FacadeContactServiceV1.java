@@ -51,9 +51,9 @@ public class FacadeContactServiceV1 {
         return optionalContact.orElseThrow(() -> new NotFoundException("Not found contact by id : " + id));
     }
 
-    public List<ContactDTO> getContract(String name) {
+    public List<ContactDTO> getContract(String name, String lastName) {
         log.debug("REST request to get contract : {}", name);
-        return contactService.findByName(name);
+        return contactService.findByName(name, lastName);
     }
 
 

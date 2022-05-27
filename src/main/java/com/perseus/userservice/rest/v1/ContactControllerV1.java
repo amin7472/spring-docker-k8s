@@ -128,9 +128,9 @@ public class ContactControllerV1 {
      * @param name the id of the contactDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the contactDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/contacts/findByName/{name}")
-    public ResponseEntity<List<ContactDTO>> getContactByName(@PathVariable String name) {
-        return new ResponseEntity<>(facadeContactServiceV1.getContract(name), HttpStatus.OK);
+    @GetMapping("/contacts/findByName/{name}/{lastName}")
+    public ResponseEntity<List<ContactDTO>> getContactByName(@PathVariable String name, @PathVariable String lastName) {
+        return new ResponseEntity<>(facadeContactServiceV1.getContract(name, lastName), HttpStatus.OK);
     }
 
 

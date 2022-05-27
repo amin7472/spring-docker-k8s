@@ -22,6 +22,7 @@ class ContactServiceImplTestIT {
     private static final String DEFAULT_FIRST_NAME = "Amin";
 
     private static final String DEFAULT_LAST_NAME = "Ahmadi";
+    private static final String DEFAULT_LAST_NAME_EXAMPLE = "Karimi";
 
     @Autowired
     private ContactService contactService;
@@ -83,9 +84,27 @@ class ContactServiceImplTestIT {
     @Test
     @Transactional
     void get_contact_by_name() {
-        String name = contactService.save(contactMapper.toDto(contact)).getFirstName();
-        assertThat(contactService.findByName(name).isEmpty()).isEqualTo(false);
+        ContactDTO contactDTO = contactService.save(contactMapper.toDto(contact));
+        assertThat(contactService.findByName(contactDTO.getFirstName(),contactDTO.getLastName()).isEmpty()).isEqualTo(false);
     }
+
+    @Test
+    @Transactional
+    void get_contact_by_name_without_last_name() {
+        ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
+        contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
+        ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
+        assertThat(contactService.findByName(contactDTO1.getFirstName(),null).size()).isEqualTo(2);
+    }
+    @Test
+    @Transactional
+    void get_contact_by_name_with_last_name() {
+        ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
+        contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
+        ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
+        assertThat(contactService.findByName(contactDTO1.getFirstName(),contactDTO2.getLastName()).contains(contactDTO2)).isEqualTo(true);
+    }
+
 
     @Test
     @Transactional

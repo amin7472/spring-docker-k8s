@@ -7,6 +7,8 @@ import com.perseus.userservice.service.dto.ContactDTO;
 import com.perseus.userservice.mapper.ContactMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
 
 
 @Service
@@ -56,8 +60,15 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<ContactDTO> findByName(String name) {
-        return contactRepository.findByFirstName(name).stream().map(contactMapper::toDto).collect(Collectors.toList());
+    public List<ContactDTO> findByName(String name,String lastName) {
+
+        Contact contact = new Contact();
+        contact.setFirstName(name);
+        contact.setLastName(lastName);
+
+        Example<Contact> example = Example.of(contact);
+
+        return contactRepository.findAll(example).stream().map(contactMapper::toDto).collect(Collectors.toList());
     }
 
     @Override

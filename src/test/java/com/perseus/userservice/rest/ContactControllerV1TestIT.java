@@ -48,7 +48,7 @@ class ContactControllerV1TestIT {
     private static final String ENTITY_API_URL = "/v1/contacts";
 
     private static final String ENTITY_API_URL_FIND_BY_ID = ENTITY_API_URL + "/findById/{id}";
-    private static final String ENTITY_API_URL_FIND_BY_NAME = ENTITY_API_URL + "/findByName/{name}";
+    private static final String ENTITY_API_URL_FIND_BY_NAME = ENTITY_API_URL + "/findByName/{name}/{lastName}";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
     private static final String ENTITY_API_ADD_EMAIL_URL_ID = ENTITY_API_URL_ID + "/email";
     private static final String ENTITY_API_ADD_PHONE_NUMBER_URL_ID = ENTITY_API_URL_ID + "/phoneNumber";
@@ -123,9 +123,9 @@ class ContactControllerV1TestIT {
 
     @Test
     void should_return_contact_by_name() throws Exception {
-        String name = contactService.save(contactMapper.toDto(contact)).getFirstName();
+        ContactDTO contactDTO = contactService.save(contactMapper.toDto(contact));
         restContactMockMvc
-                .perform(get(ENTITY_API_URL_FIND_BY_NAME, name))
+                .perform(get(ENTITY_API_URL_FIND_BY_NAME, contactDTO.getFirstName(),contactDTO.getLastName()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].firstName").value(DEFAULT_FIRST_NAME))
