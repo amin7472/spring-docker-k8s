@@ -2,6 +2,17 @@ server.port: 2019
 spring.application.name: user-service
 
 
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
+    username: {POSTGRES_USER} #postgresUser
+    password: {POSTGRES_PASSWORD} #postgresPW
+    hikari:
+      initialization-fail-timeout: 0
+
+
+
 spring.jpa:
   hibernate.ddl-auto: none
   show-sql: false
@@ -11,8 +22,6 @@ spring.liquibase:
   change-log: classpath:config/liquibase/db.changelog-master.xml
   contexts: dev
 
-spring:
-  h2:
-    console.enabled: true
+
 
 

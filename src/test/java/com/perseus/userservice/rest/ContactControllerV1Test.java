@@ -1,7 +1,7 @@
 package com.perseus.userservice.rest;
 
-import com.perseus.userservice.IntegrationTest;
 import com.perseus.userservice.TestUtil;
+import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.Contact;
 import com.perseus.userservice.repository.ContactRepository;
 import com.perseus.userservice.repository.EmailRepository;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,10 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest(classes = UserServiceApplication.class)
 
-@IntegrationTest
 @AutoConfigureMockMvc
-class ContactControllerV1TestIT {
+class ContactControllerV1Test {
 
     private static final String DEFAULT_FIRST_NAME = "Amin";
     private static final String UPDATED_FIRST_NAME = "Ahmadi";

@@ -1,6 +1,6 @@
 package com.perseus.userservice.service.impl;
 
-import com.perseus.userservice.IntegrationTest;
+import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.Contact;
 import com.perseus.userservice.mapper.ContactMapper;
 import com.perseus.userservice.service.ContactService;
@@ -8,6 +8,7 @@ import com.perseus.userservice.service.dto.ContactDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,9 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+@SpringBootTest(classes = UserServiceApplication.class)
 
-@IntegrationTest
-class ContactServiceImplTestIT {
+class ContactServiceImplTest {
 
     private static final String DEFAULT_FIRST_NAME = "Amin";
 

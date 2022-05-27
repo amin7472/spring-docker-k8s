@@ -1,6 +1,6 @@
 package com.perseus.userservice.service.impl;
 
-import com.perseus.userservice.IntegrationTest;
+import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.Email;
 import com.perseus.userservice.mapper.EmailMapper;
 import com.perseus.userservice.service.EmailService;
@@ -8,14 +8,16 @@ import com.perseus.userservice.service.dto.EmailDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@IntegrationTest
-class EmailServiceImplTestIT {
+@SpringBootTest(classes = UserServiceApplication.class)
+
+class EmailServiceImplTest {
     private static final String DEFAULT_MAIL = "amin@yahoo.com";
 
     @Autowired

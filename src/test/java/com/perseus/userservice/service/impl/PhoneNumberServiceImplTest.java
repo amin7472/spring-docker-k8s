@@ -1,6 +1,6 @@
 package com.perseus.userservice.service.impl;
 
-import com.perseus.userservice.IntegrationTest;
+import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.PhoneNumber;
 import com.perseus.userservice.mapper.PhoneNumberMapper;
 import com.perseus.userservice.service.PhoneNumberService;
@@ -8,15 +8,16 @@ import com.perseus.userservice.service.dto.PhoneNumberDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+@SpringBootTest(classes = UserServiceApplication.class)
 
-@IntegrationTest
-class PhoneNumberServiceImplTestIT {
+class PhoneNumberServiceImplTest {
 
     private static final String DEFAULT_NUMBER = "1230";
 
