@@ -12,7 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -54,8 +56,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Optional<ContactDTO> findOneByName(String name) {
-        return contactRepository.findByFirstName(name).map(contactMapper::toDto);
+    public List<ContactDTO> findByName(String name) {
+        return contactRepository.findByFirstName(name).stream().map(contactMapper::toDto).collect(Collectors.toList());
     }
 
     @Override

@@ -10,8 +10,6 @@ import com.perseus.userservice.service.dto.EmailDTO;
 import com.perseus.userservice.service.dto.PhoneNumberDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,10 +51,9 @@ public class FacadeContactServiceV1 {
         return optionalContact.orElseThrow(() -> new NotFoundException("Not found contact by id : " + id));
     }
 
-    public ContactDTO getContract(String name) {
+    public List<ContactDTO> getContract(String name) {
         log.debug("REST request to get contract : {}", name);
-        Optional<ContactDTO> optionalContact = contactService.findOneByName(name);
-        return optionalContact.orElseThrow(() -> new NotFoundException("Not found contact by name : " + name));
+        return contactService.findByName(name);
     }
 
 

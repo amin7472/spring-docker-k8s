@@ -17,7 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
-class ContactServiceImplTest {
+class ContactServiceImplTestIT {
 
     private static final String DEFAULT_FIRST_NAME = "Amin";
 
@@ -37,20 +37,14 @@ class ContactServiceImplTest {
         contact = createEntity(em);
     }
 
-    /**
-     * Create an entity for this test.
-     * <p>
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
-    public static Contact createEntity(EntityManager em) {
+    public Contact createEntity(EntityManager em) {
         Contact contact = new Contact().firstName(DEFAULT_FIRST_NAME).lastName(DEFAULT_LAST_NAME);
         return contact;
     }
 
     @Test
     @Transactional
-    void createContact() {
+    void create_new_contract() {
         int databaseSizeBeforeCreate = contactService.findAll(Pageable.unpaged()).getContent().size();
         contactService.save(contactMapper.toDto(contact));
         List<ContactDTO> contactList = contactService.findAll(Pageable.unpaged()).getContent();
@@ -62,7 +56,7 @@ class ContactServiceImplTest {
 
     @Test
     @Transactional
-    void createContactWithExistingId() {
+    void should_not_create_contact_with_existing_id() {
         ContactDTO contactDTO = contactMapper.toDto(contact);
         contactDTO = contactService.save(contactDTO);
         int databaseSizeBeforeCreate = contactService.findAll(Pageable.unpaged()).getContent().size();
@@ -73,7 +67,7 @@ class ContactServiceImplTest {
 
     @Test
     @Transactional
-    void getAllContacts() {
+    void get_all_contacts() {
         contactService.save(contactMapper.toDto(contact));
         assertThat(contactService.findAll(Pageable.unpaged()).getContent()).hasSize(1);
 
@@ -81,28 +75,28 @@ class ContactServiceImplTest {
 
     @Test
     @Transactional
-    void getContact() {
+    void get_one_contact() {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         assertThat(contactService.findOne(id).isPresent()).isEqualTo(true);
     }
 
     @Test
     @Transactional
-    void getContactByName() {
+    void get_contact_by_name() {
         String name = contactService.save(contactMapper.toDto(contact)).getFirstName();
-        assertThat(contactService.findOneByName(name).isPresent()).isEqualTo(true);
+        assertThat(contactService.findByName(name).isEmpty()).isEqualTo(false);
     }
 
     @Test
     @Transactional
-    void getNonExistingContact() {
+    void should_return_empty_optional_when_not_exist() {
         assertThat(contactService.findOne(Long.MAX_VALUE).isPresent()).isEqualTo(false);
     }
 
 
     @Test
     @Transactional
-    void deleteContact() {
+    void delete_contact() {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         int databaseSizeBeforeDelete = contactService.findAll(Pageable.unpaged()).getContent().size();
         contactService.delete(id);

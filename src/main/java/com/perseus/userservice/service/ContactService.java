@@ -6,6 +6,7 @@ import com.perseus.userservice.service.dto.ContactDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,7 +44,7 @@ public interface ContactService {
      * @param name the id of the entity.
      * @return the entity.
      */
-    Optional<ContactDTO> findOneByName(String name);
+    List<ContactDTO> findByName(String name);
 
     /**
      * Delete the "id" user.

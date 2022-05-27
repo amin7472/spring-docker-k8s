@@ -41,4 +41,12 @@ public interface EmailService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+
+    /**
+     * Get all the emails.
+     *
+     * @return the list of entities.
+     */
+    List<EmailDTO> findAll();
 }

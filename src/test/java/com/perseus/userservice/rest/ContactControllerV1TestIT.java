@@ -73,27 +73,12 @@ class ContactControllerV1TestIT {
 
     private Contact contact;
 
-    /**
-     * Create an entity for this test.
-     * <p>
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
+
     public static Contact createEntity(EntityManager em) {
         Contact contact = new Contact().firstName(DEFAULT_FIRST_NAME).lastName(DEFAULT_LAST_NAME);
         return contact;
     }
 
-    /**
-     * Create an updated entity for this test.
-     * <p>
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
-    public static Contact createUpdatedEntity(EntityManager em) {
-        Contact contact = new Contact().firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME);
-        return contact;
-    }
 
     @BeforeEach
     public void initTest() {
@@ -104,7 +89,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void createContact() throws Exception {
+    void create_new_contact() throws Exception {
         int databaseSizeBeforeCreate = contactService.findAll(Pageable.unpaged()).getContent().size();
         ContactDTO contactDTO = contactMapper.toDto(contact);
         restContactMockMvc
@@ -119,7 +104,7 @@ class ContactControllerV1TestIT {
 
 
     @Test
-    void getContactById() throws Exception {
+    void should_return_contact_by_id() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         restContactMockMvc
                 .perform(get(ENTITY_API_URL_FIND_BY_ID, id))
@@ -131,28 +116,24 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void getNonExistingContactById() throws Exception {
+    void should_status_code_be_not_found() throws Exception {
         restContactMockMvc.perform(get(ENTITY_API_URL_FIND_BY_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
-    @Test
-    void getNonExistingContactByName() throws Exception {
-        restContactMockMvc.perform(get(ENTITY_API_URL_FIND_BY_NAME, "ss")).andExpect(status().isNotFound());
-    }
 
     @Test
-    void getContactByName() throws Exception {
+    void should_return_contact_by_name() throws Exception {
         String name = contactService.save(contactMapper.toDto(contact)).getFirstName();
         restContactMockMvc
                 .perform(get(ENTITY_API_URL_FIND_BY_NAME, name))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
-                .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME));
+                .andExpect(jsonPath("$.[*].firstName").value(DEFAULT_FIRST_NAME))
+                .andExpect(jsonPath("$.[*].lastName").value(DEFAULT_LAST_NAME));
     }
 
     @Test
-    void createContactWithExistingId() throws Exception {
+    void should_get_bad_request_during_add_existed_contact() throws Exception {
         contact.setId(1L);
         ContactDTO contactDTO = contactMapper.toDto(contact);
         int databaseSizeBeforeCreate = contactService.findAll(Pageable.unpaged()).getContent().size();
@@ -164,7 +145,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void deleteContact() throws Exception {
+    void should_delete_contact() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         int databaseSizeBeforeDelete = contactService.findAll(Pageable.unpaged()).getContent().size();
         restContactMockMvc
@@ -175,7 +156,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void addEmailToContact() throws Exception {
+    void add_email_to_existed_contact() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setMail(NEW_EMAIL_ADDRESS);
@@ -192,7 +173,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void deleteEmailFromContact() throws Exception {
+    void delete_email_from_contact() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setMail(NEW_EMAIL_ADDRESS);
@@ -215,8 +196,9 @@ class ContactControllerV1TestIT {
         List<EmailDTO> emailDTOSAfterDelete = contactService.findOne(id).get().getEmails();
         assertThat(emailDTOSAfterDelete).hasSize(0);
     }
+
     @Test
-    void updateEmailFromContact() throws Exception {
+    void update_existed_email() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setMail(NEW_EMAIL_ADDRESS);
@@ -235,7 +217,7 @@ class ContactControllerV1TestIT {
         emailDTO.setMail(UPDATED_EMAIL_NAME);
         restContactMockMvc
                 .perform(
-                        put(ENTITY_API_UPDATE_EMAIL_URL_ID, id,optionalEmailDTO.get().getId())
+                        put(ENTITY_API_UPDATE_EMAIL_URL_ID, id, optionalEmailDTO.get().getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(TestUtil.convertObjectToJsonBytes(emailDTO))
                 )
@@ -248,7 +230,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void updateNumberFromContact() throws Exception {
+    void update_existed_number() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setNumber(NEW_PHONE_NUMBER);
@@ -267,7 +249,7 @@ class ContactControllerV1TestIT {
         phoneNumberDTO.setNumber(UPDATED_PHONE_NUMBER);
         restContactMockMvc
                 .perform(
-                        put(ENTITY_API_UPDATE_PHONE_NUMBER_URL_ID, id,optionalPhoneNumberDTO.get().getId())
+                        put(ENTITY_API_UPDATE_PHONE_NUMBER_URL_ID, id, optionalPhoneNumberDTO.get().getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(TestUtil.convertObjectToJsonBytes(phoneNumberDTO))
                 )
@@ -278,8 +260,9 @@ class ContactControllerV1TestIT {
         assertThat(optionalPhoneNumberDTO1.isPresent()).isEqualTo(true);
         assertThat(optionalPhoneNumberDTO1.get().getNumber()).isEqualTo(UPDATED_PHONE_NUMBER);
     }
+
     @Test
-    void deleteEmailFromContactByInvalidContactId() throws Exception {
+    void should_return_not_found_status_code_during_set_invalid_contact_id_on_email_deleting() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setMail(NEW_EMAIL_ADDRESS);
@@ -302,7 +285,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void deleteEmailFromContactByInvalidEmailId() throws Exception {
+    void should_return_not_found_status_code_during_set_invalid_email_id() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setMail(NEW_EMAIL_ADDRESS);
@@ -325,7 +308,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void deleteNumberFromContact() throws Exception {
+    void delete_number_from_contact() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setNumber(NEW_PHONE_NUMBER);
@@ -351,9 +334,8 @@ class ContactControllerV1TestIT {
     }
 
 
-
     @Test
-    void deleteNumberFromContactByInvalidContactId() throws Exception {
+    void should_return_not_found_status_code_during_set_invalid_contact_id_on_number_deleting() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setNumber(NEW_PHONE_NUMBER);
@@ -377,7 +359,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void deleteNumberFromContactByInvalidNumberId() throws Exception {
+    void should_return_not_found_status_code_during_set_invalid_number_id_on_number_deleting() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setNumber(NEW_PHONE_NUMBER);
@@ -401,7 +383,7 @@ class ContactControllerV1TestIT {
     }
 
     @Test
-    void addNumberToContact() throws Exception {
+    void add_number_to_existed_contact() throws Exception {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setNumber(NEW_PHONE_NUMBER);

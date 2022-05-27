@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/v1")
@@ -127,9 +129,8 @@ public class ContactControllerV1 {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the contactDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/contacts/findByName/{name}")
-    public ResponseEntity<ContactDTO> getContactByName(@PathVariable String name) {
-        ContactDTO contactDTO = facadeContactServiceV1.getContract(name);
-        return new ResponseEntity<>(contactDTO, HttpStatus.OK);
+    public ResponseEntity<List<ContactDTO>> getContactByName(@PathVariable String name) {
+        return new ResponseEntity<>(facadeContactServiceV1.getContract(name), HttpStatus.OK);
     }
 
 

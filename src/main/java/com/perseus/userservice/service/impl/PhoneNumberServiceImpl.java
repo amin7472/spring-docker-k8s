@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,5 +62,12 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
     public void delete(Long id) {
         log.debug("Request to delete PhoneNumber : {}", id);
         phoneNumberRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PhoneNumberDTO> findAll() {
+        log.debug("Request to get all PhoneNumbers");
+        return phoneNumberRepository.findAll().stream().map(phoneNumberMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
     }
 }

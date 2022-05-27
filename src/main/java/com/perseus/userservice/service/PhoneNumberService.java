@@ -40,4 +40,11 @@ public interface PhoneNumberService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    /**
+     * Get all the phoneNumbers.
+     *
+     * @return the list of entities.
+     */
+    List<PhoneNumberDTO> findAll();
 }
