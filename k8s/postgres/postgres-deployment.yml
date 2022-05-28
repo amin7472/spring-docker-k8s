@@ -1,5 +1,4 @@
 ---
-# Define a 'Service' To Expose postgres to Other Services
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,20 +15,19 @@ spec:
   clusterIP: None
 
 ---
-# Define a 'Persistent Voulume Claim'(PVC) for Postgress Storage, dynamically provisioned by cluster
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pv-claim # name of PVC essential for identifying the storage data
+  name: postgres-pv-claim
   labels:
     app: postgres
     tier: database
 spec:
   accessModes:
-    - ReadWriteOnce   #This specifies the mode of the claim that we are trying to create.
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi    #This will tell kubernetes about the amount of space we are trying to claim.
+      storage: 1Gi
 
 ---
 apiVersion: apps/v1
@@ -41,21 +39,21 @@ metadata:
     tier: database
 
 spec:
-  selector: # mysql Pod Should contain same labels
+  selector:
     matchLabels:
       app: postgres
   strategy:
     type: Recreate
   template:
     metadata:
-      labels: # Must match 'Service' and 'Deployment' selectors
+      labels:
         app: postgres
         tier: database
     spec:
       containers:
         - name: postgres
           image: postgres
-          imagePullPolicy: "IfNotPresent"
+          imagePullPolicy:
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -67,7 +65,7 @@ spec:
                 secretKeyRef:
                   name: postgres-credentials
                   key: postgres_password
-            - name: POSTGRES_DB # Setting Database Name from a 'ConfigMap'
+            - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: postgres-conf
