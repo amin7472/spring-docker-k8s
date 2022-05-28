@@ -1,0 +1,57 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: user-service-k8s-service
+spec:
+  type: ClusterIP
+  selector:
+    app: user-service-k8s
+  ports:
+    - name: app-port-mapping
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-k8s-deployment
+spec:
+  selector:
+    matchLabels:
+      app: user-service-k8s
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-service-k8s
+    spec:
+      containers:
+        - name: user-service-k8s
+          image: user-service:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-conf
+                  key: host
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-conf
+                  key: name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres_password
+
+

@@ -3,20 +3,23 @@ package com.perseus.userservice.service.impl;
 import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.Email;
 import com.perseus.userservice.mapper.EmailMapper;
+import com.perseus.userservice.repository.EmailRepository;
 import com.perseus.userservice.service.EmailService;
 import com.perseus.userservice.service.dto.EmailDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@SpringBootTest(classes = UserServiceApplication.class)
 
+@SpringBootTest(classes = UserServiceApplication.class)
+@ActiveProfiles("test")
 class EmailServiceImplTest {
     private static final String DEFAULT_MAIL = "amin@yahoo.com";
 
@@ -27,14 +30,15 @@ class EmailServiceImplTest {
     @Autowired
     private EmailMapper emailMapper;
 
-    @Autowired
-    private EntityManager em;
 
+
+    @Autowired
+    private EmailRepository emailRepository;
 
     private Email email;
 
 
-    public  Email createEntity(EntityManager em) {
+    public Email createEntity() {
         Email email = new Email().mail(DEFAULT_MAIL);
         return email;
     }
@@ -42,7 +46,8 @@ class EmailServiceImplTest {
 
     @BeforeEach
     public void initTest() {
-        email = createEntity(em);
+        emailRepository.deleteAll();
+        email = createEntity();
     }
 
     @Test

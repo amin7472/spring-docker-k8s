@@ -3,20 +3,23 @@ package com.perseus.userservice.service.impl;
 import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.PhoneNumber;
 import com.perseus.userservice.mapper.PhoneNumberMapper;
+import com.perseus.userservice.repository.PhoneNumberRepository;
 import com.perseus.userservice.service.PhoneNumberService;
 import com.perseus.userservice.service.dto.PhoneNumberDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@SpringBootTest(classes = UserServiceApplication.class)
 
+@SpringBootTest(classes = UserServiceApplication.class)
+@ActiveProfiles("test")
 class PhoneNumberServiceImplTest {
 
     private static final String DEFAULT_NUMBER = "1230";
@@ -29,20 +32,21 @@ class PhoneNumberServiceImplTest {
     private PhoneNumberMapper phoneNumberMapper;
 
     @Autowired
-    private EntityManager em;
+    private PhoneNumberRepository phoneNumberRepository;
 
 
     private PhoneNumber phoneNumber;
 
 
-    public  PhoneNumber createEntity(EntityManager em) {
+    public PhoneNumber createEntity() {
         PhoneNumber phoneNumber = new PhoneNumber().number(DEFAULT_NUMBER);
         return phoneNumber;
     }
 
     @BeforeEach
     public void initTest() {
-        phoneNumber = createEntity(em);
+        phoneNumberRepository.deleteAll();
+        phoneNumber = createEntity();
     }
 
     @Test
@@ -88,7 +92,7 @@ class PhoneNumberServiceImplTest {
 
     @Test
     @Transactional
-    void delete_number()  {
+    void delete_number() {
         PhoneNumberDTO phoneNumberDTO = phoneNumberService.save(phoneNumberMapper.toDto(phoneNumber));
         int databaseSizeBeforeDelete = phoneNumberService.findAll().size();
         phoneNumberService.delete(phoneNumberDTO.getId());

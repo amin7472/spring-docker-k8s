@@ -3,6 +3,7 @@ package com.perseus.userservice.service.impl;
 import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.Contact;
 import com.perseus.userservice.mapper.ContactMapper;
+import com.perseus.userservice.repository.ContactRepository;
 import com.perseus.userservice.service.ContactService;
 import com.perseus.userservice.service.dto.ContactDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,14 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@SpringBootTest(classes = UserServiceApplication.class)
 
+@SpringBootTest(classes = UserServiceApplication.class)
+@ActiveProfiles("test")
 class ContactServiceImplTest {
 
     private static final String DEFAULT_FIRST_NAME = "Amin";
@@ -29,17 +32,19 @@ class ContactServiceImplTest {
     private ContactService contactService;
 
     @Autowired
-    private ContactMapper contactMapper;
+    private ContactRepository contactRepository;
     @Autowired
-    private EntityManager em;
+    private ContactMapper contactMapper;
+
     private Contact contact;
 
     @BeforeEach
     public void initTest() {
-        contact = createEntity(em);
+        contactRepository.deleteAll();
+        contact = createEntity();
     }
 
-    public Contact createEntity(EntityManager em) {
+    public Contact createEntity() {
         Contact contact = new Contact().firstName(DEFAULT_FIRST_NAME).lastName(DEFAULT_LAST_NAME);
         return contact;
     }
@@ -86,7 +91,7 @@ class ContactServiceImplTest {
     @Transactional
     void get_contact_by_name() {
         ContactDTO contactDTO = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO.getFirstName(),contactDTO.getLastName()).isEmpty()).isEqualTo(false);
+        assertThat(contactService.findByName(contactDTO.getFirstName(), contactDTO.getLastName()).isEmpty()).isEqualTo(false);
     }
 
     @Test
@@ -95,15 +100,16 @@ class ContactServiceImplTest {
         ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
         contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
         ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO1.getFirstName(),null).size()).isEqualTo(2);
+        assertThat(contactService.findByName(contactDTO1.getFirstName(), null).size()).isEqualTo(2);
     }
+
     @Test
     @Transactional
     void get_contact_by_name_with_last_name() {
         ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
         contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
         ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO1.getFirstName(),contactDTO2.getLastName()).contains(contactDTO2)).isEqualTo(true);
+        assertThat(contactService.findByName(contactDTO1.getFirstName(), contactDTO2.getLastName()).contains(contactDTO2)).isEqualTo(true);
     }
 
 
