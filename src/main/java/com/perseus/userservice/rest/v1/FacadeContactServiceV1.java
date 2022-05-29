@@ -65,7 +65,7 @@ public class FacadeContactServiceV1 {
     public void deleteContact(Long id) {
         log.debug("REST request to delete contact : {}", id);
         if (!contactService.findOne(id).isPresent()) {
-            throw new BadRequestAlertException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + id);
+            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + id);
         }
         contactService.delete(id);
     }
@@ -89,7 +89,7 @@ public class FacadeContactServiceV1 {
         contactService.findOne(contactId)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId));
         if (phoneNumberDTO.getId() != null) {
-            throw new BadRequestAlertException(ExceptionMessagesEnum.NUMBER_ID_SHOULD_BE_NULL.getMessage());
+            throw new NotFoundException(ExceptionMessagesEnum.NUMBER_ID_SHOULD_BE_NULL.getMessage());
         }
         phoneNumberDTO.setContactId(contactId);
         return phoneNumberService.save(phoneNumberDTO);
@@ -134,7 +134,7 @@ public class FacadeContactServiceV1 {
         emailDTO.setContactId(contactId);
         EmailDTO emailDB = emailService
                 .findOne(id)
-                .orElseThrow(() -> new BadRequestAlertException(ExceptionMessagesEnum.NOT_FOUND_EMAIL_BY_ID.getMessage() + id));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_EMAIL_BY_ID.getMessage() + id));
         if (!emailDB.getContactId().equals(contactId))
             throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         return emailService.save(emailDTO);
@@ -147,7 +147,7 @@ public class FacadeContactServiceV1 {
         phoneNumberDTO.setContactId(contactId);
         PhoneNumberDTO phoneNumberDTODB = phoneNumberService
                 .findOne(id)
-                .orElseThrow(() -> new BadRequestAlertException(ExceptionMessagesEnum.NOT_FOUND_NUMBER_BY_ID.getMessage() + id));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_NUMBER_BY_ID.getMessage() + id));
         if (!phoneNumberDTODB.getContactId().equals(contactId))
             throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         return phoneNumberService.save(phoneNumberDTO);

@@ -24,8 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FacadeContactServiceV1UnitTest {
@@ -137,7 +135,7 @@ class FacadeContactServiceV1UnitTest {
     @Test
     public void should_throws_not_found_exception_on_delete() {
         given(contactService.findOne(any())).willReturn(Optional.empty());
-        assertThrows(BadRequestAlertException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             facadeContactServiceV1.deleteContact(any());
         });
     }
@@ -160,7 +158,7 @@ class FacadeContactServiceV1UnitTest {
     @Test
     public void should_add_new_phone_throws_bad_request_exception_because_of_number_id_is_not_null() {
         given(contactService.findOne(any())).willReturn(Optional.of(new ContactDTO()));
-        assertThrows(BadRequestAlertException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(10L, "01111"), any());
         });
     }

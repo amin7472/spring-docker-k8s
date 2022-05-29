@@ -4,6 +4,11 @@ package com.perseus.userservice.rest.v1;
 import com.perseus.userservice.service.dto.ContactDTO;
 import com.perseus.userservice.service.dto.EmailDTO;
 import com.perseus.userservice.service.dto.PhoneNumberDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/contacts")
+@Tag(name = "Contact Resource")
 public class ContactControllerV1 {
 
     private final FacadeContactServiceV1 facadeContactServiceV1;
@@ -21,47 +27,60 @@ public class ContactControllerV1 {
         this.facadeContactServiceV1 = facadeContactServiceV1;
     }
 
-    /**
-     * {@code POST} : Create a new contact.
-     *
-     * @param contactDTO the contactDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new contactDTO,
-     * or with status {@code 400 (Bad Request)} if the contact has already an ID.
-     */
     @PostMapping()
+    @Operation(summary = "This api use to add the new contact")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201",
+                    description = " Contact saved in database",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400",
+                    description = "If the contact or its child has already an ID",
+                    content = @Content)
+    })
     public ResponseEntity<ContactDTO> createContact(@RequestBody ContactDTO contactDTO) {
         ContactDTO result = facadeContactServiceV1.createNewContact(contactDTO);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    /**
-     * {@code POST /:id/email} : add new email to an existing contact.
-     *
-     * @param id       the id of the contactDTO to save.
-     * @param emailDTO the contactDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated contactDTO,
-     * or with status {@code 400 (Bad Request)} if the contactDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the contactDTO couldn't be updated.
-     */
-    @PostMapping("/{id}/email")
+
+    @PostMapping("/{contactId}/email")
+    @Operation(summary = "This api use to add the new email to existing contact")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "New email add to contact",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400",
+                    description = "The email has already an ID",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500",
+                    description = "The email couldn't be updated",
+                    content = @Content)
+    })
     public ResponseEntity<EmailDTO> addNewEmail(
-            @PathVariable(value = "id") final Long id,
+            @PathVariable(value = "contactId") final Long contactId,
             @RequestBody EmailDTO emailDTO
     ) {
-        EmailDTO result = facadeContactServiceV1.addNewEmail(emailDTO, id);
+        EmailDTO result = facadeContactServiceV1.addNewEmail(emailDTO, contactId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    /**
-     * {@code PUT  /:id/email} : add new email to an existing contact.
-     *
-     * @param contactId the id of the contactDTO to save.
-     * @param emailDTO  the contactDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated emailDTO,
-     * or with status {@code 400 (Bad Request)} if the emailId or contactId  is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the emailDTO couldn't be updated.
-     */
+
     @PutMapping("/{contactId}/email/{emailId}")
+    @Operation(summary = "This api use to update the existing email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "email has updated",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact or email not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500",
+                    description = "The email couldn't be updated",
+                    content = @Content)
+    })
     public ResponseEntity<EmailDTO> updateEmail(
             @PathVariable(value = "contactId") Long contactId,
             @PathVariable(value = "emailId") Long emailId,
@@ -72,16 +91,22 @@ public class ContactControllerV1 {
     }
 
 
-    /**
-     * {@code POST  /:id/phoneNumber} : add new number to an existing contact.
-     *
-     * @param contactId             the id of the contactDTO that should add number to it.
-     * @param phoneNumberDTO the phoneNumberDTO to add.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated phoneNumberDTO,
-     * or with status {@code 400 (Bad Request)} if the contactId is not valid or phoneNumberDTO.id is not null,
-     * or with status {@code 500 (Internal Server Error)} if the phoneNumberDTO couldn't be added.
-     */
     @PostMapping("/{contactId}/phoneNumber")
+    @Operation(summary = "This api use to add the new number to existing contact")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "New number add to contact",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400",
+                    description = "The number has already an ID",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500",
+                    description = "The number couldn't be updated",
+                    content = @Content)
+    })
     public ResponseEntity<PhoneNumberDTO> addNewPhoneNumber(
             @PathVariable(value = "contactId") Long contactId,
             @RequestBody PhoneNumberDTO phoneNumberDTO
@@ -90,17 +115,19 @@ public class ContactControllerV1 {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    /**
-     * {@code POST  /:id/phoneNumber} : add new number to an existing contact.
-     *
-     * @param contactId      the id of the contactDTO.
-     * @param numberId       the id of the phoneNumberDTO.
-     * @param phoneNumberDTO the contactDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated phoneNumberDTO,
-     * or with status {@code 400 (Bad Request)} if the phoneNumberDTO is not valid or contactId or numberId is not exist in db ,
-     * or with status {@code 500 (Internal Server Error)} if the phoneNumberDTO couldn't be updated.
-     */
     @PutMapping("/{contactId}/phoneNumber/{numberId}")
+    @Operation(summary = "This api use to update the existing number")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "number has updated",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact or number not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500",
+                    description = "The email couldn't be updated",
+                    content = @Content)
+    })
     public ResponseEntity<PhoneNumberDTO> updatePhoneNumber(
             @PathVariable(value = "contactId") Long contactId,
             @PathVariable(value = "numberId") Long numberId,
@@ -110,60 +137,75 @@ public class ContactControllerV1 {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    /**
-     * {@code GET  /findById/:contactId} : get the "contactId" contact.
-     *
-     * @param contactId the id of the contactDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the contactDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/findById/{contactId}")
+    @Operation(summary = "This api use to find contact by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "exist contact with id",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact not found",
+                    content = @Content)
+    })
     public ResponseEntity<ContactDTO> getContactById(@PathVariable Long contactId) {
         ContactDTO contactDTO = facadeContactServiceV1.getContact(contactId);
         return new ResponseEntity<>(contactDTO, HttpStatus.OK);
     }
 
 
-    /**
-     * {@code GET  /findByName/:name} : get the "name" contact.
-     *
-     * @param name the id of the contactDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the contactDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/findByName/{name}/{lastName}")
+    @Operation(summary = "This api use to find contact by name and family")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "exist contacts",
+                    content = {@Content(mediaType = "application/json")})
+    })
     public ResponseEntity<List<ContactDTO>> getContactByName(@PathVariable String name, @PathVariable String lastName) {
         return new ResponseEntity<>(facadeContactServiceV1.getContact(name, lastName), HttpStatus.OK);
     }
 
 
-    /**
-     * {@code DELETE  /:contactId} : delete the contact.
-     *
-     * @param contactId the id of the contactDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{contactId}")
+    @Operation(summary = "This api use to delete contact by all of its child")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",
+                    description = "contact deleted",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact not found",
+                    content = @Content)
+    })
     public ResponseEntity<Void> deleteContact(@PathVariable Long contactId) {
         facadeContactServiceV1.deleteContact(contactId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    /**
-     * {@code DELETE  /:contactId/email/:emailId} : delete the email by contactId and emailId
-     *
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{contactId}/email/{emailId}")
+    @Operation(summary = "This api use to delete the custom email of contact")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",
+                    description = "email deleted",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact or email not found",
+                    content = @Content)
+    })
     public ResponseEntity<Void> deleteContactEmail(@PathVariable Long contactId, @PathVariable Long emailId) {
         facadeContactServiceV1.deleteEmail(emailId, contactId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    /**
-     * {@code DELETE  /:contactId/phoneNumber/:numberId} : delete the number by contactId and numberId
-     *
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
+
     @DeleteMapping("/{contactId}/phoneNumber/{numberId}")
+    @Operation(summary = "This api use to delete the custom number of contact")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",
+                    description = "number deleted",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "The contact or number not found",
+                    content = @Content)
+    })
     public ResponseEntity<Void> deleteContactNumber(@PathVariable Long contactId, @PathVariable Long numberId) {
         facadeContactServiceV1.deletePhoneNumber(numberId, contactId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
