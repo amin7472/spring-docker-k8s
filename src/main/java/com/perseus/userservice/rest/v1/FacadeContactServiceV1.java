@@ -33,10 +33,10 @@ public class FacadeContactServiceV1 {
 
 
     @Transactional
-    public ContactDTO createNewContract(ContactDTO contactDTO) {
-        log.debug("REST request to save contract : {}", contactDTO);
+    public ContactDTO createNewContact(ContactDTO contactDTO) {
+        log.debug("REST request to save contact : {}", contactDTO);
         if (contactDTO.getId() != null) {
-            throw new BadRequestAlertException("A new contract cannot already have an ID");
+            throw new BadRequestAlertException("A new contact cannot already have an ID");
         }
         contactDTO = contactService.save(contactDTO);
 
@@ -45,20 +45,20 @@ public class FacadeContactServiceV1 {
         return contactDTO;
     }
 
-    public ContactDTO getContract(Long id) {
-        log.debug("REST request to get contract : {}", id);
+    public ContactDTO getContact(Long id) {
+        log.debug("REST request to get contact : {}", id);
         Optional<ContactDTO> optionalContact = contactService.findOne(id);
         return optionalContact.orElseThrow(() -> new NotFoundException("Not found contact by id : " + id));
     }
 
-    public List<ContactDTO> getContract(String name, String lastName) {
-        log.debug("REST request to get contract : {}", name);
+    public List<ContactDTO> getContact(String name, String lastName) {
+        log.debug("REST request to get contact : {}", name);
         return contactService.findByName(name, lastName);
     }
 
 
-    public void deleteContract(Long id) {
-        log.debug("REST request to delete contract : {}", id);
+    public void deleteContact(Long id) {
+        log.debug("REST request to delete contact : {}", id);
         if (!contactService.findOne(id).isPresent()) {
             throw new BadRequestAlertException("Entity not found");
         }
@@ -66,10 +66,10 @@ public class FacadeContactServiceV1 {
     }
 
 
-    public void prepareEmails(List<EmailDTO> emailDTO, Long contractId) {
+    public void prepareEmails(List<EmailDTO> emailDTO, Long contactId) {
         if (emailDTO != null && !emailDTO.isEmpty()) {
             emailDTO.stream().forEach(email -> {
-                email.setContactId(contractId);
+                email.setContactId(contactId);
                 if (email.getId() != null) {
                     throw new BadRequestAlertException("A new email cannot already have an ID");
                 }
@@ -155,10 +155,10 @@ public class FacadeContactServiceV1 {
         return phoneNumberService.save(phoneNumberDTO);
     }
 
-    public void preparePhoneNumbers(List<PhoneNumberDTO> phoneNumberDTOS, Long contractId) {
+    public void preparePhoneNumbers(List<PhoneNumberDTO> phoneNumberDTOS, Long contactId) {
         if (phoneNumberDTOS != null && !phoneNumberDTOS.isEmpty()) {
             phoneNumberDTOS.stream().forEach(phoneNumberDTO -> {
-                phoneNumberDTO.setContactId(contractId);
+                phoneNumberDTO.setContactId(contactId);
                 if (phoneNumberDTO.getId() != null) {
                     throw new BadRequestAlertException("A new email cannot already have an ID");
                 }

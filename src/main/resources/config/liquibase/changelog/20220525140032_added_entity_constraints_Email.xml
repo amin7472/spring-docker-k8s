@@ -8,7 +8,7 @@
 
         <addForeignKeyConstraint baseColumnNames="contact_id"
                                  baseTableName="email"
-                                 constraintName="fk_email__contract_id"
+                                 constraintName="fk_email__contact_id"
                                  referencedColumnNames="id"
                                  referencedTableName="contact"/>
     </changeSet>

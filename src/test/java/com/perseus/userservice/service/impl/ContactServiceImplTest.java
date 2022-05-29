@@ -51,7 +51,7 @@ class ContactServiceImplTest {
 
     @Test
     @Transactional
-    void create_new_contract() {
+    void create_new_contact() {
         int databaseSizeBeforeCreate = contactService.findAll(Pageable.unpaged()).getContent().size();
         contactService.save(contactMapper.toDto(contact));
         List<ContactDTO> contactList = contactService.findAll(Pageable.unpaged()).getContent();

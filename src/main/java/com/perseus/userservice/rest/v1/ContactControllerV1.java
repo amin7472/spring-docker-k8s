@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/contacts")
 public class ContactControllerV1 {
 
     private final FacadeContactServiceV1 facadeContactServiceV1;
@@ -22,19 +22,20 @@ public class ContactControllerV1 {
     }
 
     /**
-     * {@code POST  /contacts} : Create a new contact.
+     * {@code POST} : Create a new contact.
      *
      * @param contactDTO the contactDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new contactDTO, or with status {@code 400 (Bad Request)} if the contact has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new contactDTO,
+     * or with status {@code 400 (Bad Request)} if the contact has already an ID.
      */
-    @PostMapping("/contacts")
-    public ResponseEntity<ContactDTO> createUser(@RequestBody ContactDTO contactDTO) {
-        ContactDTO result = facadeContactServiceV1.createNewContract(contactDTO);
+    @PostMapping()
+    public ResponseEntity<ContactDTO> createContact(@RequestBody ContactDTO contactDTO) {
+        ContactDTO result = facadeContactServiceV1.createNewContact(contactDTO);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     /**
-     * {@code POST /contacts/:id/email} : add new email to an existing contact.
+     * {@code POST /:id/email} : add new email to an existing contact.
      *
      * @param id       the id of the contactDTO to save.
      * @param emailDTO the contactDTO to update.
@@ -42,7 +43,7 @@ public class ContactControllerV1 {
      * or with status {@code 400 (Bad Request)} if the contactDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the contactDTO couldn't be updated.
      */
-    @PostMapping("/contacts/{id}/email")
+    @PostMapping("/{id}/email")
     public ResponseEntity<EmailDTO> addNewEmail(
             @PathVariable(value = "id") final Long id,
             @RequestBody EmailDTO emailDTO
@@ -52,15 +53,15 @@ public class ContactControllerV1 {
     }
 
     /**
-     * {@code PUT  /contacts/:id/email} : add new email to an existing contact.
+     * {@code PUT  /:id/email} : add new email to an existing contact.
      *
      * @param contactId the id of the contactDTO to save.
      * @param emailDTO  the contactDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated contactDTO,
-     * or with status {@code 400 (Bad Request)} if the contactDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the contactDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated emailDTO,
+     * or with status {@code 400 (Bad Request)} if the emailId or contactId  is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the emailDTO couldn't be updated.
      */
-    @PutMapping("/contacts/{contactId}/email/{emailId}")
+    @PutMapping("/{contactId}/email/{emailId}")
     public ResponseEntity<EmailDTO> updateEmail(
             @PathVariable(value = "contactId") Long contactId,
             @PathVariable(value = "emailId") Long emailId,
@@ -72,34 +73,34 @@ public class ContactControllerV1 {
 
 
     /**
-     * {@code POST  /contacts/:id/phoneNumber} : add new number to an existing contact.
+     * {@code POST  /:id/phoneNumber} : add new number to an existing contact.
      *
-     * @param id             the id of the contactDTO to save.
-     * @param phoneNumberDTO the contactDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated contactDTO,
-     * or with status {@code 400 (Bad Request)} if the contactDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the contactDTO couldn't be updated.
+     * @param contactId             the id of the contactDTO that should add number to it.
+     * @param phoneNumberDTO the phoneNumberDTO to add.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated phoneNumberDTO,
+     * or with status {@code 400 (Bad Request)} if the contactId is not valid or phoneNumberDTO.id is not null,
+     * or with status {@code 500 (Internal Server Error)} if the phoneNumberDTO couldn't be added.
      */
-    @PostMapping("/contacts/{id}/phoneNumber")
+    @PostMapping("/{contactId}/phoneNumber")
     public ResponseEntity<PhoneNumberDTO> addNewPhoneNumber(
-            @PathVariable(value = "id") Long id,
+            @PathVariable(value = "contactId") Long contactId,
             @RequestBody PhoneNumberDTO phoneNumberDTO
     ) {
-        PhoneNumberDTO result = facadeContactServiceV1.addNewPhoneNumber(phoneNumberDTO, id);
+        PhoneNumberDTO result = facadeContactServiceV1.addNewPhoneNumber(phoneNumberDTO, contactId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
-     * {@code POST  /contacts/:id/phoneNumber} : add new number to an existing contact.
+     * {@code POST  /:id/phoneNumber} : add new number to an existing contact.
      *
      * @param contactId      the id of the contactDTO.
      * @param numberId       the id of the phoneNumberDTO.
      * @param phoneNumberDTO the contactDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated contactDTO,
-     * or with status {@code 400 (Bad Request)} if the contactDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the contactDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated phoneNumberDTO,
+     * or with status {@code 400 (Bad Request)} if the phoneNumberDTO is not valid or contactId or numberId is not exist in db ,
+     * or with status {@code 500 (Internal Server Error)} if the phoneNumberDTO couldn't be updated.
      */
-    @PutMapping("/contacts/{contactId}/phoneNumber/{numberId}")
+    @PutMapping("/{contactId}/phoneNumber/{numberId}")
     public ResponseEntity<PhoneNumberDTO> updatePhoneNumber(
             @PathVariable(value = "contactId") Long contactId,
             @PathVariable(value = "numberId") Long numberId,
@@ -110,63 +111,62 @@ public class ContactControllerV1 {
     }
 
     /**
-     * {@code GET  /contacts/:id} : get the "id" contact.
+     * {@code GET  /findById/:contactId} : get the "contactId" contact.
      *
      * @param contactId the id of the contactDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the contactDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/contacts/findById/{contactId}")
+    @GetMapping("/findById/{contactId}")
     public ResponseEntity<ContactDTO> getContactById(@PathVariable Long contactId) {
-        ContactDTO contactDTO = facadeContactServiceV1.getContract(contactId);
+        ContactDTO contactDTO = facadeContactServiceV1.getContact(contactId);
         return new ResponseEntity<>(contactDTO, HttpStatus.OK);
     }
 
 
     /**
-     * {@code GET  /contacts/findByName/:name} : get the "name" contact.
+     * {@code GET  /findByName/:name} : get the "name" contact.
      *
      * @param name the id of the contactDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the contactDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/contacts/findByName/{name}/{lastName}")
+    @GetMapping("/findByName/{name}/{lastName}")
     public ResponseEntity<List<ContactDTO>> getContactByName(@PathVariable String name, @PathVariable String lastName) {
-        return new ResponseEntity<>(facadeContactServiceV1.getContract(name, lastName), HttpStatus.OK);
+        return new ResponseEntity<>(facadeContactServiceV1.getContact(name, lastName), HttpStatus.OK);
     }
 
 
     /**
-     * {@code DELETE  /contacts/:id} : delete the "id" contact.
+     * {@code DELETE  /:contactId} : delete the contact.
      *
      * @param contactId the id of the contactDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/contacts/{contactId}")
+    @DeleteMapping("/{contactId}")
     public ResponseEntity<Void> deleteContact(@PathVariable Long contactId) {
-        facadeContactServiceV1.deleteContract(contactId);
+        facadeContactServiceV1.deleteContact(contactId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * {@code DELETE  /contacts/:id} : delete the "id" contact.
+     * {@code DELETE  /:contactId/email/:emailId} : delete the email by contactId and emailId
      *
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/contacts/{contactId}/email/{emailId}")
+    @DeleteMapping("/{contactId}/email/{emailId}")
     public ResponseEntity<Void> deleteContactEmail(@PathVariable Long contactId, @PathVariable Long emailId) {
         facadeContactServiceV1.deleteEmail(emailId, contactId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * {@code DELETE  /contacts/:id} : delete the "id" contact.
+     * {@code DELETE  /:contactId/phoneNumber/:numberId} : delete the number by contactId and numberId
      *
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/contacts/{contactId}/phoneNumber/{numberId}")
+    @DeleteMapping("/{contactId}/phoneNumber/{numberId}")
     public ResponseEntity<Void> deleteContactNumber(@PathVariable Long contactId, @PathVariable Long numberId) {
         facadeContactServiceV1.deletePhoneNumber(numberId, contactId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 
 }

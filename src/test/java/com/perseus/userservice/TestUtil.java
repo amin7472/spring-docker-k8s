@@ -157,7 +157,7 @@ public final class TestUtil {
     }
 
     /**
-     * Verifies the equals/hashcode contract on the domain object.
+     * Verifies the equals/hashcode contact on the domain object.
      */
     public static <T> void equalsVerifier(Class<T> clazz) throws Exception {
         T domainObject1 = clazz.getConstructor().newInstance();

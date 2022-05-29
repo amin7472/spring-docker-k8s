@@ -3,9 +3,7 @@ package com.perseus.userservice.domain;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- * A Email.
- */
+
 @Entity
 @Table(name = "email")
 public class Email implements Serializable {
