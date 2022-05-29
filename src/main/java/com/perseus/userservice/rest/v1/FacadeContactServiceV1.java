@@ -1,6 +1,7 @@
 package com.perseus.userservice.rest.v1;
 
 import com.perseus.userservice.exception.BadRequestAlertException;
+import com.perseus.userservice.exception.ExceptionMessagesEnum;
 import com.perseus.userservice.exception.NotFoundException;
 import com.perseus.userservice.service.ContactService;
 import com.perseus.userservice.service.EmailService;
@@ -10,11 +11,12 @@ import com.perseus.userservice.service.dto.EmailDTO;
 import com.perseus.userservice.service.dto.PhoneNumberDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,7 +38,7 @@ public class FacadeContactServiceV1 {
     public ContactDTO createNewContact(ContactDTO contactDTO) {
         log.debug("REST request to save contact : {}", contactDTO);
         if (contactDTO.getId() != null) {
-            throw new BadRequestAlertException("A new contact cannot already have an ID");
+            throw new BadRequestAlertException(ExceptionMessagesEnum.CONTACT_ID_SHOULD_BE_NULL.getMessage());
         }
         contactDTO = contactService.save(contactDTO);
 
@@ -45,22 +47,25 @@ public class FacadeContactServiceV1 {
         return contactDTO;
     }
 
+    @Cacheable(cacheNames = "contact-by-id", key = "#id")
     public ContactDTO getContact(Long id) {
-        log.debug("REST request to get contact : {}", id);
+        log.info("REST request to get contact : {}", id);
         Optional<ContactDTO> optionalContact = contactService.findOne(id);
-        return optionalContact.orElseThrow(() -> new NotFoundException("Not found contact by id : " + id));
+        return optionalContact.orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + id));
     }
 
+    @Cacheable(cacheNames = "contact-by-name", key = "#name.concat('-').concat(#lastName)")
     public List<ContactDTO> getContact(String name, String lastName) {
         log.debug("REST request to get contact : {}", name);
         return contactService.findByName(name, lastName);
     }
 
 
+    @CacheEvict(cacheNames = "contact-by-id", key = "#id")
     public void deleteContact(Long id) {
         log.debug("REST request to delete contact : {}", id);
         if (!contactService.findOne(id).isPresent()) {
-            throw new BadRequestAlertException("Entity not found");
+            throw new BadRequestAlertException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + id);
         }
         contactService.delete(id);
     }
@@ -71,87 +76,80 @@ public class FacadeContactServiceV1 {
             emailDTO.stream().forEach(email -> {
                 email.setContactId(contactId);
                 if (email.getId() != null) {
-                    throw new BadRequestAlertException("A new email cannot already have an ID");
+                    throw new BadRequestAlertException(ExceptionMessagesEnum.EMAIL_ID_SHOULD_BE_NULL.getMessage());
                 }
             });
             emailService.saveAll(emailDTO);
         }
     }
 
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public PhoneNumberDTO addNewPhoneNumber(PhoneNumberDTO phoneNumberDTO, Long contactId) {
         log.debug("REST request to add PhoneNumber to contact: {}", contactId);
         contactService.findOne(contactId)
-                .orElseThrow(() -> new NotFoundException("Not found contact by id : " + contactId));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId));
         if (phoneNumberDTO.getId() != null) {
-            throw new BadRequestAlertException("A new phoneNumber cannot already have an ID");
+            throw new BadRequestAlertException(ExceptionMessagesEnum.NUMBER_ID_SHOULD_BE_NULL.getMessage());
         }
         phoneNumberDTO.setContactId(contactId);
         return phoneNumberService.save(phoneNumberDTO);
     }
 
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public EmailDTO addNewEmail(EmailDTO emailDTO, Long contactId) {
         log.debug("REST request to add Email to contact : {}", contactId);
         contactService.findOne(contactId)
-                .orElseThrow(() -> new NotFoundException("Not found contact by id : " + contactId));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId));
         if (emailDTO.getId() != null) {
-            throw new BadRequestAlertException("A new email cannot already have an ID");
+            throw new BadRequestAlertException(ExceptionMessagesEnum.EMAIL_ID_SHOULD_BE_NULL.getMessage());
         }
         emailDTO.setContactId(contactId);
         return emailService.save(emailDTO);
     }
 
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public void deleteEmail(Long emailId, Long contactId) {
         log.debug("REST request to delete Email : {} from contact : {}", emailId, contactId);
         EmailDTO emailDTO = emailService.findOne(emailId)
-                .orElseThrow(() -> new NotFoundException("Not found number by id : " + contactId));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_EMAIL_BY_ID.getMessage() + contactId));
         if (!emailDTO.getContactId().equals(contactId))
-            throw new NotFoundException("Not found contact by id : " + contactId);
+            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         emailService.delete(emailId);
     }
 
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public void deletePhoneNumber(Long phoneNumberId, Long contactId) {
         log.debug("REST request to delete PhoneNumber : {} from contact : {}", phoneNumberId, contactId);
         PhoneNumberDTO phoneNumberDTO = phoneNumberService.findOne(phoneNumberId)
-                .orElseThrow(() -> new NotFoundException("Not found number by id : " + contactId));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_NUMBER_BY_ID.getMessage() + contactId));
         if (!phoneNumberDTO.getContactId().equals(contactId))
-            throw new NotFoundException("Not found contact by id : " + contactId);
+            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         phoneNumberService.delete(phoneNumberId);
     }
 
-
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public EmailDTO updateEmail(Long contactId, Long id, EmailDTO emailDTO) {
         log.debug("REST request to update Email : {}, {}", id, emailDTO);
         emailDTO.setId(id);
         emailDTO.setContactId(contactId);
-        if (emailDTO.getId() == null) {
-            throw new BadRequestAlertException("Id cannot be null");
-        }
-        if (!Objects.equals(id, emailDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID");
-        }
-        EmailDTO EmailDB = emailService
+        EmailDTO emailDB = emailService
                 .findOne(id)
-                .orElseThrow(() -> new BadRequestAlertException("Not found email by id : " + id));
-        if (!EmailDB.getContactId().equals(contactId))
-            throw new NotFoundException("Not found contact by id : " + contactId);
+                .orElseThrow(() -> new BadRequestAlertException(ExceptionMessagesEnum.NOT_FOUND_EMAIL_BY_ID.getMessage() + id));
+        if (!emailDB.getContactId().equals(contactId))
+            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         return emailService.save(emailDTO);
     }
 
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public PhoneNumberDTO updatePhoneNumber(Long contactId, Long id, PhoneNumberDTO phoneNumberDTO) {
         log.debug("REST request to update PhoneNumber : {}, {}", id, phoneNumberDTO);
         phoneNumberDTO.setId(id);
         phoneNumberDTO.setContactId(contactId);
-        if (phoneNumberDTO.getId() == null) {
-            throw new BadRequestAlertException("Id cannot be null");
-        }
-        if (!Objects.equals(id, phoneNumberDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID");
-        }
         PhoneNumberDTO phoneNumberDTODB = phoneNumberService
                 .findOne(id)
-                .orElseThrow(() -> new BadRequestAlertException("Not found number by id : " + id));
+                .orElseThrow(() -> new BadRequestAlertException(ExceptionMessagesEnum.NOT_FOUND_NUMBER_BY_ID.getMessage() + id));
         if (!phoneNumberDTODB.getContactId().equals(contactId))
-            throw new NotFoundException("Not found contact by id : " + contactId);
+            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         return phoneNumberService.save(phoneNumberDTO);
     }
 
@@ -160,12 +158,11 @@ public class FacadeContactServiceV1 {
             phoneNumberDTOS.stream().forEach(phoneNumberDTO -> {
                 phoneNumberDTO.setContactId(contactId);
                 if (phoneNumberDTO.getId() != null) {
-                    throw new BadRequestAlertException("A new email cannot already have an ID");
+                    throw new BadRequestAlertException(ExceptionMessagesEnum.NUMBER_ID_SHOULD_BE_NULL.getMessage());
                 }
             });
             phoneNumberService.saveAll(phoneNumberDTOS);
         }
-
     }
 
 }

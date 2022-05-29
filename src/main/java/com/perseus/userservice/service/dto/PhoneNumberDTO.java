@@ -14,6 +14,14 @@ public class PhoneNumberDTO implements Serializable {
 
     private String number;
 
+    public PhoneNumberDTO(Long id, String number) {
+        this.id = id;
+        this.number = number;
+    }
+
+    public PhoneNumberDTO() {
+    }
+
     @JsonIgnore
     private Long contactId;
 

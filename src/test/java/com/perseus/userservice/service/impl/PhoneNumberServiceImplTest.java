@@ -81,13 +81,13 @@ class PhoneNumberServiceImplTest {
     @Transactional
     void get_number() {
         PhoneNumberDTO phoneNumberDTO = phoneNumberService.save(phoneNumberMapper.toDto(phoneNumber));
-        assertThat(phoneNumberService.findOne(phoneNumberDTO.getId()).isPresent()).isEqualTo(true);
+        assertThat(phoneNumberService.findOne(phoneNumberDTO.getId()).isPresent()).isTrue();
     }
 
     @Test
     @Transactional
     void should_return_empty_optional_when_not_exist() {
-        assertThat(phoneNumberService.findOne(Long.MAX_VALUE).isPresent()).isEqualTo(false);
+        assertThat(phoneNumberService.findOne(Long.MAX_VALUE).isPresent()).isFalse();
     }
 
     @Test

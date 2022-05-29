@@ -45,7 +45,7 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
         log.debug("Request to save PhoneNumber by size : {}", phoneNumberDTO.size());
         List<PhoneNumber> phoneNumber = phoneNumberDTO
                 .stream()
-                .map(phoneNumberDTO1 -> phoneNumberMapper.toEntity(phoneNumberDTO1))
+                .map(phoneNumberMapper::toEntity)
                 .collect(Collectors.toList());
         phoneNumberRepository.saveAll(phoneNumber);
     }

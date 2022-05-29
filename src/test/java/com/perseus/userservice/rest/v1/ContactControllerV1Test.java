@@ -1,8 +1,9 @@
-package com.perseus.userservice.rest;
+package com.perseus.userservice.rest.v1;
 
 import com.perseus.userservice.TestUtil;
 import com.perseus.userservice.UserServiceApplication;
 import com.perseus.userservice.domain.Contact;
+import com.perseus.userservice.mapper.ContactMapper;
 import com.perseus.userservice.repository.ContactRepository;
 import com.perseus.userservice.repository.EmailRepository;
 import com.perseus.userservice.repository.PhoneNumberRepository;
@@ -10,12 +11,12 @@ import com.perseus.userservice.service.ContactService;
 import com.perseus.userservice.service.dto.ContactDTO;
 import com.perseus.userservice.service.dto.EmailDTO;
 import com.perseus.userservice.service.dto.PhoneNumberDTO;
-import com.perseus.userservice.mapper.ContactMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -73,6 +74,10 @@ class ContactControllerV1Test {
     @Autowired
     private MockMvc restContactMockMvc;
 
+    @Autowired
+    private CacheManager cacheManager;
+
+
     private Contact contact;
 
 
@@ -115,6 +120,80 @@ class ContactControllerV1Test {
                 .andExpect(jsonPath("$.id").value(id.intValue()))
                 .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
                 .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME));
+
+    }
+
+    @Test
+    void should_exist_contact_in_cache() throws Exception {
+        Long id = contactService.save(contactMapper.toDto(contact)).getId();
+        restContactMockMvc.perform(get(ENTITY_API_URL_FIND_BY_ID, id));
+        ContactDTO contactOnCache = (ContactDTO) cacheManager.getCache("contact-by-id").get(id).get();
+        assertThat(contactOnCache.getFirstName()).isEqualTo(contact.getFirstName());
+    }
+
+    @Test
+    void should_not_exist_contact_in_cache_after_deleted_contact() throws Exception {
+        Long id = contactService.save(contactMapper.toDto(contact)).getId();
+        restContactMockMvc.perform(get(ENTITY_API_URL_FIND_BY_ID, id));
+        restContactMockMvc.perform(delete(ENTITY_API_URL_ID, id).accept(MediaType.APPLICATION_JSON));
+        assertThat(cacheManager.getCache("contact-by-id").get(id)).isEqualTo(null);
+    }
+
+    @Test
+    void should_not_exist_contact_in_cache_after_add_email() throws Exception {
+        Long id = contactService.save(contactMapper.toDto(contact)).getId();
+        restContactMockMvc.perform(get(ENTITY_API_URL_FIND_BY_ID, id));
+
+        ContactDTO contactOnCache = (ContactDTO) cacheManager.getCache("contact-by-id").get(id).get();
+        assertThat(contactOnCache.getFirstName()).isEqualTo(contact.getFirstName());
+
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setMail(NEW_EMAIL_ADDRESS);
+        restContactMockMvc
+                .perform(
+                        post(ENTITY_API_ADD_EMAIL_URL_ID, id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(TestUtil.convertObjectToJsonBytes(emailDTO))
+                )
+                .andExpect(status().isOk());
+
+        assertThat(cacheManager.getCache("contact-by-id").get(id)).isEqualTo(null);
+    }
+
+
+    @Test
+    void should_not_exist_contact_in_cache_after_add_number() throws Exception {
+        Long id = contactService.save(contactMapper.toDto(contact)).getId();
+        restContactMockMvc.perform(get(ENTITY_API_URL_FIND_BY_ID, id));
+
+        ContactDTO contactOnCache = (ContactDTO) cacheManager.getCache("contact-by-id").get(id).get();
+        assertThat(contactOnCache.getFirstName()).isEqualTo(contact.getFirstName());
+
+        PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
+        phoneNumberDTO.setNumber(NEW_PHONE_NUMBER);
+        restContactMockMvc
+                .perform(
+                        post(ENTITY_API_ADD_PHONE_NUMBER_URL_ID, id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(TestUtil.convertObjectToJsonBytes(phoneNumberDTO))
+                )
+                .andExpect(status().isOk());
+
+        assertThat(cacheManager.getCache("contact-by-id").get(id)).isEqualTo(null);
+    }
+
+
+    @Test
+    void should_one_time_hit_to_db() throws Exception {
+        Long id = contactService.save(contactMapper.toDto(contact)).getId();
+        restContactMockMvc
+                .perform(get(ENTITY_API_URL_FIND_BY_ID, id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").value(id.intValue()))
+                .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
+                .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME));
+
     }
 
     @Test
@@ -127,7 +206,7 @@ class ContactControllerV1Test {
     void should_return_contact_by_name() throws Exception {
         ContactDTO contactDTO = contactService.save(contactMapper.toDto(contact));
         restContactMockMvc
-                .perform(get(ENTITY_API_URL_FIND_BY_NAME, contactDTO.getFirstName(),contactDTO.getLastName()))
+                .perform(get(ENTITY_API_URL_FIND_BY_NAME, contactDTO.getFirstName(), contactDTO.getLastName()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].firstName").value(DEFAULT_FIRST_NAME))
@@ -171,7 +250,7 @@ class ContactControllerV1Test {
                 .andExpect(status().isOk());
         List<EmailDTO> emailDTOS = contactService.findOne(id).get().getEmails();
         assertThat(emailDTOS.stream().anyMatch(email -> email.getMail().equals(NEW_EMAIL_ADDRESS)))
-                .isEqualTo(true);
+                .isTrue();
     }
 
     @Test
@@ -190,7 +269,7 @@ class ContactControllerV1Test {
         Optional<EmailDTO> optionalEmailDTO = emailDTOS
                 .stream()
                 .filter(email -> email.getMail().equals(NEW_EMAIL_ADDRESS)).findFirst();
-        assertThat(optionalEmailDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalEmailDTO.isPresent()).isTrue();
         restContactMockMvc
                 .perform(delete(ENTITY_API_UPDATE_EMAIL_URL_ID, id, optionalEmailDTO.get().getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -215,7 +294,7 @@ class ContactControllerV1Test {
         Optional<EmailDTO> optionalEmailDTO = emailDTOS
                 .stream()
                 .filter(email -> email.getMail().equals(NEW_EMAIL_ADDRESS)).findFirst();
-        assertThat(optionalEmailDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalEmailDTO.isPresent()).isTrue();
         emailDTO.setMail(UPDATED_EMAIL_NAME);
         restContactMockMvc
                 .perform(
@@ -227,7 +306,7 @@ class ContactControllerV1Test {
         Optional<EmailDTO> optionalEmailDTO1 = contactService.findOne(id).get()
                 .getEmails().stream().filter(email -> email.getId().equals(optionalEmailDTO.get().getId()))
                 .findFirst();
-        assertThat(optionalEmailDTO1.isPresent()).isEqualTo(true);
+        assertThat(optionalEmailDTO1.isPresent()).isTrue();
         assertThat(optionalEmailDTO1.get().getMail()).isEqualTo(UPDATED_EMAIL_NAME);
     }
 
@@ -247,7 +326,7 @@ class ContactControllerV1Test {
         Optional<PhoneNumberDTO> optionalPhoneNumberDTO = phoneNumberDTOS
                 .stream()
                 .filter(email -> email.getNumber().equals(NEW_PHONE_NUMBER)).findFirst();
-        assertThat(optionalPhoneNumberDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalPhoneNumberDTO.isPresent()).isTrue();
         phoneNumberDTO.setNumber(UPDATED_PHONE_NUMBER);
         restContactMockMvc
                 .perform(
@@ -259,7 +338,7 @@ class ContactControllerV1Test {
         Optional<PhoneNumberDTO> optionalPhoneNumberDTO1 = contactService.findOne(id).get()
                 .getPhoneNumbers().stream().filter(phoneNumberDTO1 -> phoneNumberDTO1.getId().equals(optionalPhoneNumberDTO.get().getId()))
                 .findFirst();
-        assertThat(optionalPhoneNumberDTO1.isPresent()).isEqualTo(true);
+        assertThat(optionalPhoneNumberDTO1.isPresent()).isTrue();
         assertThat(optionalPhoneNumberDTO1.get().getNumber()).isEqualTo(UPDATED_PHONE_NUMBER);
     }
 
@@ -279,7 +358,7 @@ class ContactControllerV1Test {
         Optional<EmailDTO> optionalEmailDTO = emailDTOS
                 .stream()
                 .filter(email -> email.getMail().equals(NEW_EMAIL_ADDRESS)).findFirst();
-        assertThat(optionalEmailDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalEmailDTO.isPresent()).isTrue();
         restContactMockMvc
                 .perform(delete(ENTITY_API_UPDATE_EMAIL_URL_ID, Long.MAX_VALUE, optionalEmailDTO.get().getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -302,7 +381,7 @@ class ContactControllerV1Test {
         Optional<EmailDTO> optionalEmailDTO = emailDTOS
                 .stream()
                 .filter(email -> email.getMail().equals(NEW_EMAIL_ADDRESS)).findFirst();
-        assertThat(optionalEmailDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalEmailDTO.isPresent()).isTrue();
         restContactMockMvc
                 .perform(delete(ENTITY_API_UPDATE_EMAIL_URL_ID, id, Long.MAX_VALUE)
                         .accept(MediaType.APPLICATION_JSON))
@@ -326,7 +405,7 @@ class ContactControllerV1Test {
         Optional<PhoneNumberDTO> optionalPhoneNumberDTO = phoneNumberDTOS
                 .stream()
                 .filter(email -> email.getNumber().equals(NEW_PHONE_NUMBER)).findFirst();
-        assertThat(optionalPhoneNumberDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalPhoneNumberDTO.isPresent()).isTrue();
         restContactMockMvc
                 .perform(delete(ENTITY_API_UPDATE_PHONE_NUMBER_URL_ID, id, optionalPhoneNumberDTO.get().getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -353,7 +432,7 @@ class ContactControllerV1Test {
         Optional<PhoneNumberDTO> optionalPhoneNumberDTO = phoneNumberDTOS
                 .stream()
                 .filter(email -> email.getNumber().equals(NEW_PHONE_NUMBER)).findFirst();
-        assertThat(optionalPhoneNumberDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalPhoneNumberDTO.isPresent()).isTrue();
         restContactMockMvc
                 .perform(delete(ENTITY_API_UPDATE_PHONE_NUMBER_URL_ID, Long.MAX_VALUE, optionalPhoneNumberDTO.get().getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -377,7 +456,7 @@ class ContactControllerV1Test {
         Optional<PhoneNumberDTO> optionalPhoneNumberDTO = phoneNumberDTOS
                 .stream()
                 .filter(email -> email.getNumber().equals(NEW_PHONE_NUMBER)).findFirst();
-        assertThat(optionalPhoneNumberDTO.isPresent()).isEqualTo(true);
+        assertThat(optionalPhoneNumberDTO.isPresent()).isTrue();
         restContactMockMvc
                 .perform(delete(ENTITY_API_UPDATE_PHONE_NUMBER_URL_ID, id, Long.MAX_VALUE)
                         .accept(MediaType.APPLICATION_JSON))
@@ -398,7 +477,7 @@ class ContactControllerV1Test {
                 .andExpect(status().isOk());
         List<PhoneNumberDTO> emailDTOS = contactService.findOne(id).get().getPhoneNumbers();
         assertThat(emailDTOS.stream().anyMatch(phoneNumberDTO1 -> phoneNumberDTO1.getNumber().equals(NEW_PHONE_NUMBER)))
-                .isEqualTo(true);
+                .isTrue();
     }
 
 }

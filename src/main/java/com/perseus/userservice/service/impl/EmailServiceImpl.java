@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void saveAll(List<EmailDTO> emailDTOs) {
         log.debug("Request to save list of  Email by size  : {}", emailDTOs.size());
-        List<Email> emails = emailDTOs.stream().map(emailDTO -> emailMapper.toEntity(emailDTO)).collect(Collectors.toList());
+        List<Email> emails = emailDTOs.stream().map(emailMapper::toEntity).collect(Collectors.toList());
         emailRepository.saveAll(emails);
     }
 

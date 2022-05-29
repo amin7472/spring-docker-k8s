@@ -86,7 +86,7 @@ public class ContactDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "UserDTO{" +
+        return "ContactDTO{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

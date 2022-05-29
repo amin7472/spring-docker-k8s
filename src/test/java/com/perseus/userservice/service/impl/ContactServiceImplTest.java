@@ -84,14 +84,14 @@ class ContactServiceImplTest {
     @Transactional
     void get_one_contact() {
         Long id = contactService.save(contactMapper.toDto(contact)).getId();
-        assertThat(contactService.findOne(id).isPresent()).isEqualTo(true);
+        assertThat(contactService.findOne(id).isPresent()).isTrue();
     }
 
     @Test
     @Transactional
     void get_contact_by_name() {
         ContactDTO contactDTO = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO.getFirstName(), contactDTO.getLastName()).isEmpty()).isEqualTo(false);
+        assertThat(contactService.findByName(contactDTO.getFirstName(), contactDTO.getLastName()).isEmpty()).isFalse();
     }
 
     @Test
@@ -109,14 +109,14 @@ class ContactServiceImplTest {
         ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
         contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
         ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO1.getFirstName(), contactDTO2.getLastName()).contains(contactDTO2)).isEqualTo(true);
+        assertThat(contactService.findByName(contactDTO1.getFirstName(), contactDTO2.getLastName()).contains(contactDTO2)).isTrue();
     }
 
 
     @Test
     @Transactional
     void should_return_empty_optional_when_not_exist() {
-        assertThat(contactService.findOne(Long.MAX_VALUE).isPresent()).isEqualTo(false);
+        assertThat(contactService.findOne(Long.MAX_VALUE).isPresent()).isFalse();
     }
 
 

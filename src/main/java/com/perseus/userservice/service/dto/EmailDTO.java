@@ -17,6 +17,15 @@ public class EmailDTO implements Serializable {
     @JsonIgnore
     private Long contactId;
 
+
+    public EmailDTO(Long id, String mail) {
+        this.mail = mail;
+        this.id = id;
+    }
+
+    public EmailDTO() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -40,6 +49,7 @@ public class EmailDTO implements Serializable {
     public void setContactId(Long contactId) {
         this.contactId = contactId;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -66,9 +76,9 @@ public class EmailDTO implements Serializable {
     @Override
     public String toString() {
         return "EmailDTO{" +
-            "id=" + getId() +
-            ", mail='" + getMail() + "'" +
-            ", contact=" + getContactId() +
-            "}";
+                "id=" + getId() +
+                ", mail='" + getMail() + "'" +
+                ", contact=" + getContactId() +
+                "}";
     }
 }
