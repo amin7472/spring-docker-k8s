@@ -59,6 +59,11 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
     }
 
     @Override
+    public Optional<PhoneNumberDTO> findByIdAndContactId(Long id, Long contactId) {
+        return phoneNumberRepository.findByIdAndContactId(id, contactId).map(phoneNumberMapper::toDto);
+    }
+
+    @Override
     public void delete(Long id) {
         log.debug("Request to delete PhoneNumber : {}", id);
         phoneNumberRepository.deleteById(id);

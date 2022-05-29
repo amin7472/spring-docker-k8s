@@ -35,6 +35,16 @@ public interface EmailService {
      */
     Optional<EmailDTO> findOne(Long id);
 
+
+    /**
+     * Get the "id" email.
+     *
+     * @param emailId the id of the entity.
+     * @param contactId the id of the entity.
+     * @return the entity.
+     */
+    Optional<EmailDTO> findByIdAndContactId(Long emailId, Long contactId);
+
     /**
      * Delete the "id" email.
      *

@@ -1,6 +1,7 @@
 package com.perseus.userservice.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,9 +11,9 @@ import java.util.Objects;
  */
 public class EmailDTO implements Serializable {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
 
-    // TODO: 29.05.22 impl email validation 
     private String mail;
 
     @JsonIgnore

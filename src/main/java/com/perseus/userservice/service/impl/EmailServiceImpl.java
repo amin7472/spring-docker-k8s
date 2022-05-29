@@ -54,6 +54,11 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public Optional<EmailDTO> findByIdAndContactId(Long emailId, Long contactId) {
+        return emailRepository.findByIdAndContactId(emailId, contactId).map(emailMapper::toDto);
+    }
+
+    @Override
     public void delete(Long id) {
         log.debug("Request to delete Email : {}", id);
         emailRepository.deleteById(id);

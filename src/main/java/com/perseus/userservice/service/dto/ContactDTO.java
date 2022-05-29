@@ -1,6 +1,7 @@
 package com.perseus.userservice.service.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.perseus.userservice.domain.Contact;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Objects;
  * A DTO for the {@link Contact} entity.
  */
 public class ContactDTO implements Serializable {
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
 
     private String firstName;

@@ -35,6 +35,14 @@ public interface PhoneNumberService {
     Optional<PhoneNumberDTO> findOne(Long id);
 
     /**
+     * Get the "id" phoneNumber.
+     *
+     * @param id the id of the entity.
+     * @return the entity.
+     */
+    Optional<PhoneNumberDTO> findByIdAndContactId(Long id, Long contactId);
+
+    /**
      * Delete the "id" phoneNumber.
      *
      * @param id the id of the entity.

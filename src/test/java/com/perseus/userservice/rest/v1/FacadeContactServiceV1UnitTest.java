@@ -27,6 +27,14 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class FacadeContactServiceV1UnitTest {
+    private static final String DEFAULT_FIRST_NAME = "Amin";
+    private static final String DEFAULT_LAST_NAME = "Ahmadi";
+
+    private static final String DEFAULT_PHONE_NUMBER = "09104875972";
+    private static final String DEFAULT_EMAIL = "amin_bb@yahoo.com";
+
+
+
     @Mock
     ContactService contactService;
     @Mock
@@ -41,7 +49,7 @@ class FacadeContactServiceV1UnitTest {
     @Test
     public void save_contact() {
         ContactDTO contactDTO = new ContactDTO();
-        contactDTO.setLastName("amin");
+        contactDTO.setLastName(DEFAULT_FIRST_NAME);
         ContactDTO contactAfterSave = new ContactDTO();
         contactAfterSave.setFirstName(contactDTO.getFirstName());
         contactAfterSave.setId(10L);
@@ -55,7 +63,7 @@ class FacadeContactServiceV1UnitTest {
     public void should_throws_bad_request_exception_because_of_contact_id() {
         ContactDTO contactDTO = new ContactDTO();
         contactDTO.setId(10L);
-        contactDTO.setLastName("amin");
+        contactDTO.setLastName(DEFAULT_LAST_NAME);
         assertThrows(BadRequestAlertException.class, () -> {
             facadeContactServiceV1.createNewContact(contactDTO);
         });
@@ -65,7 +73,7 @@ class FacadeContactServiceV1UnitTest {
     public void should_throws_bad_request_exception_because_of_email_id_is_not_null() {
         ContactDTO contactDTO = new ContactDTO();
         List<EmailDTO> emailDTOS = new ArrayList<>();
-        emailDTOS.add(new EmailDTO(1l, "test"));
+        emailDTOS.add(new EmailDTO(1l, DEFAULT_EMAIL));
         contactDTO.setEmails(emailDTOS);
         given(contactService.save(any())).willReturn(contactDTO);
         assertThrows(BadRequestAlertException.class, () -> {
@@ -77,7 +85,7 @@ class FacadeContactServiceV1UnitTest {
     public void should_throws_bad_request_exception_because_of_number_id_is_not_null() {
         ContactDTO contactDTO = new ContactDTO();
         List<PhoneNumberDTO> phoneNumberDTOS = new ArrayList<>();
-        phoneNumberDTOS.add(new PhoneNumberDTO(1l, "test"));
+        phoneNumberDTOS.add(new PhoneNumberDTO(1l, DEFAULT_PHONE_NUMBER));
         contactDTO.setPhoneNumbers(phoneNumberDTOS);
         given(contactService.save(any())).willReturn(contactDTO);
         assertThrows(BadRequestAlertException.class, () -> {
@@ -91,8 +99,6 @@ class FacadeContactServiceV1UnitTest {
         contactDTO.setId(10L);
         given(contactService.findOne(any())).willReturn(Optional.of(contactDTO));
         assertThat(facadeContactServiceV1.getContact(10L)).isEqualTo(contactDTO);
-
-
     }
 
     @Test
@@ -108,8 +114,8 @@ class FacadeContactServiceV1UnitTest {
     public void should_return_contact_by_name() {
         ContactDTO contactDTO = new ContactDTO();
         contactDTO.setId(10L);
-        contactDTO.setFirstName("amin");
-        contactDTO.setLastName("ahmadi");
+        contactDTO.setFirstName(DEFAULT_FIRST_NAME);
+        contactDTO.setLastName(DEFAULT_LAST_NAME);
 
         given(contactService.contactFilterByName(any(), any())).willReturn(Arrays.asList(contactDTO));
 
@@ -144,14 +150,14 @@ class FacadeContactServiceV1UnitTest {
     @Test
     public void should_add_new_phone() {
         given(contactService.findOne(any())).willReturn(Optional.of(new ContactDTO()));
-        facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(null, "01111"), any());
+        facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(null, "09104875972"), any());
     }
 
     @Test
     public void should_add_new_phone_throws_not_found_exception_because_of_not_exit_contact_id() {
         given(contactService.findOne(any())).willReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> {
-            facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(null, "01111"), any());
+            facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(null, "09104875972"), any());
         });
     }
 
@@ -159,14 +165,14 @@ class FacadeContactServiceV1UnitTest {
     public void should_add_new_phone_throws_bad_request_exception_because_of_number_id_is_not_null() {
         given(contactService.findOne(any())).willReturn(Optional.of(new ContactDTO()));
         assertThrows(NotFoundException.class, () -> {
-            facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(10L, "01111"), any());
+            facadeContactServiceV1.addNewPhoneNumber(new PhoneNumberDTO(10L, "09104875972"), any());
         });
     }
 
     @Test
     public void should_add_new_email() {
         given(contactService.findOne(any())).willReturn(Optional.of(new ContactDTO()));
-        facadeContactServiceV1.addNewEmail(new EmailDTO(null, "01111"), any());
+        facadeContactServiceV1.addNewEmail(new EmailDTO(null, "09104875972"), any());
     }
 
     @Test
@@ -264,12 +270,12 @@ class FacadeContactServiceV1UnitTest {
     public void should_update_number() {
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setContactId(10L);
-        phoneNumberDTO.setNumber("123");
+        phoneNumberDTO.setNumber("09104875972");
         phoneNumberDTO.setId(11L);
 
         PhoneNumberDTO phoneNumberDb = new PhoneNumberDTO();
         phoneNumberDb.setContactId(10L);
-        phoneNumberDb.setNumber("1233");
+        phoneNumberDb.setNumber("09104875972");
         phoneNumberDb.setId(11L);
 
         given(phoneNumberService.findOne(any())).willReturn(Optional.of(phoneNumberDb));
@@ -282,11 +288,11 @@ class FacadeContactServiceV1UnitTest {
     public void should_update_number_throws_not_found_exception_because_of_contact_is_not_exist() {
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
         phoneNumberDTO.setContactId(10L);
-        phoneNumberDTO.setNumber("123");
+        phoneNumberDTO.setNumber("09104875972");
         phoneNumberDTO.setId(11L);
         given(phoneNumberService.findOne(any())).willReturn(Optional.of(phoneNumberDTO));
         assertThrows(NotFoundException.class, () -> {
-            facadeContactServiceV1.updatePhoneNumber(15L, any(),new PhoneNumberDTO(null,"152"));
+            facadeContactServiceV1.updatePhoneNumber(15L, any(),new PhoneNumberDTO(null,"09104875972"));
         });
     }
 }

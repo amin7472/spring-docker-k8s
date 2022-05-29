@@ -24,8 +24,8 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(BadRequestAlertException.class)
-    public ResponseEntity<ErrorMessage> badRequestExceptionHandler(BadRequestAlertException ex, WebRequest request) {
+    @ExceptionHandler({BadRequestAlertException.class, ValidationException.class,})
+    public ResponseEntity<ErrorMessage> badRequestExceptionHandler(Exception ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 new Date(),
@@ -34,24 +34,17 @@ public class ControllerExceptionHandler {
 
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorMessage> badRequestValidationExceptionHandler(ValidationException ex, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false));
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorMessage> notFoundExceptionHandler(NotFoundException ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.NOT_FOUND.value(),
                 new Date(),
                 ex.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorMessage> methodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage(
