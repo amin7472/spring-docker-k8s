@@ -12,6 +12,7 @@ public class EmailDTO implements Serializable {
 
     private Long id;
 
+    // TODO: 29.05.22 impl email validation 
     private String mail;
 
     @JsonIgnore

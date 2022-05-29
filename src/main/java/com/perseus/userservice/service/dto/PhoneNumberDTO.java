@@ -11,7 +11,7 @@ import java.util.Objects;
 public class PhoneNumberDTO implements Serializable {
 
     private Long id;
-
+    // TODO: 29.05.22 impl number validation
     private String number;
 
     public PhoneNumberDTO(Long id, String number) {
