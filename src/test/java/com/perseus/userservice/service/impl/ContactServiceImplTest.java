@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,7 +90,7 @@ class ContactServiceImplTest {
     @Transactional
     void get_contact_by_name() {
         ContactDTO contactDTO = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO.getFirstName(), contactDTO.getLastName()).isEmpty()).isFalse();
+        assertThat(contactService.contactFilterByName(contactDTO.getFirstName(), contactDTO.getLastName()).isEmpty()).isFalse();
     }
 
     @Test
@@ -100,7 +99,7 @@ class ContactServiceImplTest {
         ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
         contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
         ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO1.getFirstName(), null).size()).isEqualTo(2);
+        assertThat(contactService.contactFilterByName(contactDTO1.getFirstName(), null).size()).isEqualTo(2);
     }
 
     @Test
@@ -109,7 +108,7 @@ class ContactServiceImplTest {
         ContactDTO contactDTO1 = contactService.save(contactMapper.toDto(contact));
         contact.setLastName(DEFAULT_LAST_NAME_EXAMPLE);
         ContactDTO contactDTO2 = contactService.save(contactMapper.toDto(contact));
-        assertThat(contactService.findByName(contactDTO1.getFirstName(), contactDTO2.getLastName()).contains(contactDTO2)).isTrue();
+        assertThat(contactService.contactFilterByName(contactDTO1.getFirstName(), contactDTO2.getLastName()).contains(contactDTO2)).isTrue();
     }
 
 

@@ -111,14 +111,14 @@ class FacadeContactServiceV1UnitTest {
         contactDTO.setFirstName("amin");
         contactDTO.setLastName("ahmadi");
 
-        given(contactService.findByName(any(), any())).willReturn(Arrays.asList(contactDTO));
+        given(contactService.contactFilterByName(any(), any())).willReturn(Arrays.asList(contactDTO));
 
         assertThat(facadeContactServiceV1.getContact(any(), any())).contains(contactDTO);
     }
 
     @Test
     public void should_return_empty_list_by_name() {
-        given(contactService.findByName(any(), any())).willReturn(new ArrayList<>());
+        given(contactService.contactFilterByName(any(), any())).willReturn(new ArrayList<>());
         assertThat(facadeContactServiceV1.getContact(any(), any())).isEmpty();
     }
 

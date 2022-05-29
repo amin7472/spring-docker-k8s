@@ -153,15 +153,17 @@ public class ContactControllerV1 {
     }
 
 
-    @GetMapping("/findByName/{name}/{lastName}")
+    @GetMapping("/filterByName")
     @Operation(summary = "This api use to find contact by name and family")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "exist contacts",
                     content = {@Content(mediaType = "application/json")})
     })
-    public ResponseEntity<List<ContactDTO>> getContactByName(@PathVariable String name, @PathVariable String lastName) {
-        return new ResponseEntity<>(facadeContactServiceV1.getContact(name, lastName), HttpStatus.OK);
+    public ResponseEntity<List<ContactDTO>> getContactByName(@RequestParam(name = "fName", required = false) String fName
+            , @RequestParam(name = "lName", required = false) String lName) {
+
+        return new ResponseEntity<>(facadeContactServiceV1.getContact(fName, lName), HttpStatus.OK);
     }
 
 

@@ -44,7 +44,7 @@ public interface ContactService {
      * @param name the id of the entity.
      * @return the entity.
      */
-    List<ContactDTO> findByName(String name,String lastName);
+    List<ContactDTO> contactFilterByName(String name, String lastName);
 
     /**
      * Delete the "id" user.

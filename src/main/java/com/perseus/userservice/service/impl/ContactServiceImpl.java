@@ -57,7 +57,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<ContactDTO> findByName(String name,String lastName) {
+    public List<ContactDTO> contactFilterByName(String name, String lastName) {
 
         Contact contact = new Contact();
         contact.setFirstName(name);

@@ -34,7 +34,15 @@ public class ControllerExceptionHandler {
 
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
-
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorMessage> badRequestValidationExceptionHandler(ValidationException ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorMessage> notFoundExceptionHandler(NotFoundException ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage(

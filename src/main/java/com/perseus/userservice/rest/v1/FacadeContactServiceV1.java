@@ -47,27 +47,25 @@ public class FacadeContactServiceV1 {
         return contactDTO;
     }
 
-    @Cacheable(cacheNames = "contact-by-id", key = "#id")
-    public ContactDTO getContact(Long id) {
-        log.info("REST request to get contact : {}", id);
-        Optional<ContactDTO> optionalContact = contactService.findOne(id);
-        return optionalContact.orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + id));
+    @Cacheable(cacheNames = "contact-by-id", key = "#contactId")
+    public ContactDTO getContact(Long contactId) {
+        log.info("REST request to get contact : {}", contactId);
+        Optional<ContactDTO> optionalContact = contactService.findOne(contactId);
+        return optionalContact.orElseThrow(() -> new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId));
     }
 
-    @Cacheable(cacheNames = "contact-by-name", key = "#name.concat('-').concat(#lastName)")
     public List<ContactDTO> getContact(String name, String lastName) {
         log.debug("REST request to get contact : {}", name);
-        return contactService.findByName(name, lastName);
+        return contactService.contactFilterByName(name, lastName);
     }
 
-
-    @CacheEvict(cacheNames = "contact-by-id", key = "#id")
-    public void deleteContact(Long id) {
-        log.debug("REST request to delete contact : {}", id);
-        if (!contactService.findOne(id).isPresent()) {
-            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + id);
+    @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
+    public void deleteContact(Long contactId) {
+        log.debug("REST request to delete contact : {}", contactId);
+        if (!contactService.findOne(contactId).isPresent()) {
+            throw new NotFoundException(ExceptionMessagesEnum.NOT_FOUND_CONTACT_BY_ID.getMessage() + contactId);
         }
-        contactService.delete(id);
+        contactService.delete(contactId);
     }
 
 
