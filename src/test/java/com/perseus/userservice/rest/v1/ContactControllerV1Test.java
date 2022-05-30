@@ -45,7 +45,7 @@ class ContactControllerV1Test {
     private static final String NEW_PHONE_NUMBER = "0910005000";
 
     private static final String UPDATED_EMAIL_NAME = "aminNew@yahoo.com";
-    private static final String UPDATED_PHONE_NUMBER = "09120525";
+    private static final String UPDATED_PHONE_NUMBER = "2055550125";
 
 
     private static final String ENTITY_API_URL = "/v1/contacts";

@@ -22,7 +22,7 @@ class ValidationUtilTest {
     @Test
     public void number_valid() {
         String[] validPhoneNumbers
-                = {"2055550125", "202 555 0125", "(202) 555-0125", "+111 (202) 555-0125",
+                = {"2055550125","202 555 0125", "(202) 555-0125", "+111 (202) 555-0125",
                 "636 856 789", "+111 636 856 789", "636 85 67 89", "+111 636 85 67 89"};
         for (String phoneNumber : validPhoneNumbers) {
             assertThat(ValidationUtil.numberIsValid(phoneNumber)).isTrue();

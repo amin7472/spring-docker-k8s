@@ -73,11 +73,12 @@ public class FacadeContactServiceV1 {
     @CacheEvict(cacheNames = "contact-by-id", key = "#contactId")
     public PhoneNumberDTO addNewPhoneNumber(PhoneNumberDTO phoneNumberDTO, Long contactId) {
         log.debug("REST request to add PhoneNumber to contact: {}", contactId);
-        if (phoneNumberDTO.getId() != null) {
-            throw new NotFoundException(ExceptionMessagesEnum.NUMBER_ID_SHOULD_BE_NULL.getMessage());
-        }
+
         if (!ValidationUtil.numberIsValid(phoneNumberDTO.getNumber())) {
             throw new ValidationException(ExceptionMessagesEnum.NUMBER_FORMAT_IS_INVALID.getMessage() + phoneNumberDTO.getNumber());
+        }
+        if (phoneNumberDTO.getId() != null) {
+            throw new BadRequestAlertException(ExceptionMessagesEnum.NUMBER_ID_SHOULD_BE_NULL.getMessage());
         }
         validateContactId(contactId);
         phoneNumberDTO.setContactId(contactId);
