@@ -245,7 +245,6 @@ class FacadeContactServiceV1UnitTest {
         assertThat(facadeContactServiceV1.updateEmail(DEFAULT_CONTACT_ID, 11L, emailDTO)).isEqualTo(emailDTO);
     }
 
-
     @Test
     public void should_update_number() {
         PhoneNumberDTO phoneNumberDTO = new PhoneNumberDTO();
@@ -263,7 +262,6 @@ class FacadeContactServiceV1UnitTest {
         assertThat(facadeContactServiceV1.updatePhoneNumber(DEFAULT_CONTACT_ID, 11L, phoneNumberDTO)).isEqualTo(phoneNumberDTO);
     }
 
-
     @Test
     public void should_add_new_phone_throws_bad_request_exception_because_of_number_id_is_not_null() {
         assertThrows(BadRequestAlertException.class, () -> {
@@ -271,14 +269,12 @@ class FacadeContactServiceV1UnitTest {
         });
     }
 
-
     @Test
     public void should_add_new_email_throws_bad_request_exception_because_of_number_id_is_not_null() {
         assertThrows(BadRequestAlertException.class, () -> {
             facadeContactServiceV1.addNewEmail(new EmailDTO(DEFAULT_CONTACT_ID, DEFAULT_EMAIL), DEFAULT_CONTACT_ID);
         });
     }
-
 
     @Test
     public void should_update_email_throws_not_found_exception_because_of_contact_is_not_exist() {

@@ -29,11 +29,10 @@ In this project we have simple contact service.
 9. Then run below command to get access service on you localhost
     > kubectl  port-forward svc/user-service-k8s-service 8080:8080
                                                                     
-10. click [here](localhost:8080/swagger-ui.html) to access swagger
-
+10. click [swagger](http://localhost:8080/swagger-ui.html)
 
 > **Note:**
->- Recomand
+>- I suggest deploy on linux(ubuntu and ...) os
 >- If use the minikube as kubernetes node , step 3,4,5,6 must be run on same terminal command line.
 
 
