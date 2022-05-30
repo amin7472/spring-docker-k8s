@@ -39,6 +39,9 @@ class FacadeContactServiceV1UnitTest {
 
     private static final String UPDATE_EMAIL = "amin_update@yahoo.com";
 
+    private static final String INVALID_EMAIL = "amin_update@yahoo.com";
+    private static final String INVALID_PHONE_NUMBER = "2055553639";
+
 
     @Mock
     ContactService contactService;
@@ -299,4 +302,6 @@ class FacadeContactServiceV1UnitTest {
             facadeContactServiceV1.updatePhoneNumber(DEFAULT_CONTACT_ID, DEFAULT_PHONE_ID, new PhoneNumberDTO(null, UPDATE_PHONE_NUMBER));
         });
     }
+
+
 }
