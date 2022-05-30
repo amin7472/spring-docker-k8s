@@ -36,10 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ContactControllerV1Test {
 
     private static final String DEFAULT_FIRST_NAME = "Amin";
-    private static final String UPDATED_FIRST_NAME = "Ahmadi";
 
     private static final String DEFAULT_LAST_NAME = "Nima";
-    private static final String UPDATED_LAST_NAME = "Ahmadi";
 
     private static final String NEW_EMAIL_ADDRESS = "amin@yahoo.com";
     private static final String NEW_PHONE_NUMBER = "0910005000";
